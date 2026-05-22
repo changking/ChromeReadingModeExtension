@@ -81,15 +81,15 @@
 }
 
 #reader-view[data-rv-panel-position="top"] #rv-control-panel {
-  top: -280px;
+  top: 0;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-100%);
   border-radius: 0 0 12px 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
 #reader-view[data-rv-panel-position="top"] #rv-control-panel.rv-open {
-  top: 0;
+  transform: translateX(-50%);
 }
 
 /* ===== BOTTOM ===== */
@@ -101,15 +101,15 @@
 }
 
 #reader-view[data-rv-panel-position="bottom"] #rv-control-panel {
-  bottom: -280px;
+  bottom: 0;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(100%);
   border-radius: 12px 12px 0 0;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
 }
 
 #reader-view[data-rv-panel-position="bottom"] #rv-control-panel.rv-open {
-  bottom: 0;
+  transform: translateX(-50%);
 }
 
 /* ===== PANEL INNER STYLES ===== */
