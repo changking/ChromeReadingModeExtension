@@ -18,35 +18,8 @@ if (!ControlPanel) {
       Object.assign(this.settings, saved);
 
       this.applyPanelPosition(this.settings.panelPosition);
-
-      this.applyTheme(this.settings.theme);
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        if (this.settings.theme === 'system') {
-          this.applySystemTheme();
-        }
-      });
-
       this.createToggleButton();
       this.createPanel();
-    },
-
-    resolveTheme() {
-      return this.settings.theme === 'system'
-        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-        : this.settings.theme;
-    },
-
-    applySettings() {
-      ReaderView.applySettings({ ...this.settings, theme: this.resolveTheme() });
-    },
-
-    applyTheme(theme) {
-      this.settings.theme = theme;
-      this.applySettings();
-    },
-
-    applySystemTheme() {
-      this.applySettings();
     },
 
     createToggleButton() {
@@ -71,7 +44,6 @@ if (!ControlPanel) {
             <button class="rv-theme-btn" data-theme="light" title="浅色"></button>
             <button class="rv-theme-btn" data-theme="dark" title="深色"></button>
             <button class="rv-theme-btn" data-theme="sepia" title="护眼棕"></button>
-            <button class="rv-theme-btn" data-theme="system" title="跟随系统"></button>
           </div>
         </div>
 
@@ -139,7 +111,7 @@ if (!ControlPanel) {
         target.parentElement.querySelectorAll('.rv-theme-btn').forEach(b => b.classList.remove('rv-active'));
         target.classList.add('rv-active');
         chrome.storage.sync.set({ theme: value });
-        this.applySettings();
+        ReaderView.applySettings(this.settings);
         return;
       }
 
@@ -149,7 +121,7 @@ if (!ControlPanel) {
         target.parentElement.querySelectorAll('.rv-size-btn').forEach(b => b.classList.remove('rv-active'));
         target.classList.add('rv-active');
         chrome.storage.sync.set({ maxWidth: value });
-        this.applySettings();
+        ReaderView.applySettings(this.settings);
         return;
       }
 
@@ -179,7 +151,7 @@ if (!ControlPanel) {
       }
 
       chrome.storage.sync.set({ [key]: value });
-      this.applySettings();
+      ReaderView.applySettings(this.settings);
     },
 
     updateActiveStates() {

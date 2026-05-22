@@ -15,7 +15,7 @@ if (!ReaderView) {
       ];
 
       const articleHTML = `
-        <div id="reader-view" data-rv-theme="${window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'}" data-rv-panel-position="right">
+        <div id="reader-view" data-rv-theme="light" data-rv-panel-position="right">
           <div class="rv-container">
             <div class="rv-header">
               <h1 class="rv-title">${this.escapeHTML(article.title)}</h1>
