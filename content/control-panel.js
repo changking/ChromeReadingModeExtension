@@ -18,8 +18,28 @@ if (!ControlPanel) {
       Object.assign(this.settings, saved);
 
       this.applyPanelPosition(this.settings.panelPosition);
+
+      this.applyTheme(this.settings.theme);
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (this.settings.theme === 'system') {
+          this.applySystemTheme();
+        }
+      });
+
       this.createToggleButton();
       this.createPanel();
+    },
+
+    applyTheme(theme) {
+      const resolved = theme === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : theme;
+      ReaderView.applySettings({ ...this.settings, theme: resolved });
+    },
+
+    applySystemTheme() {
+      const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      ReaderView.applySettings({ ...this.settings, theme });
     },
 
     createToggleButton() {
@@ -44,6 +64,7 @@ if (!ControlPanel) {
             <button class="rv-theme-btn" data-theme="light" title="浅色"></button>
             <button class="rv-theme-btn" data-theme="dark" title="深色"></button>
             <button class="rv-theme-btn" data-theme="sepia" title="护眼棕"></button>
+            <button class="rv-theme-btn" data-theme="system" title="跟随系统"></button>
           </div>
         </div>
 
@@ -111,7 +132,7 @@ if (!ControlPanel) {
         target.parentElement.querySelectorAll('.rv-theme-btn').forEach(b => b.classList.remove('rv-active'));
         target.classList.add('rv-active');
         chrome.storage.sync.set({ theme: value });
-        ReaderView.applySettings(this.settings);
+        this.applyTheme(value);
         return;
       }
 

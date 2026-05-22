@@ -160,6 +160,7 @@
 #rv-control-panel .rv-theme-btn[data-theme="light"] { background: #ffffff; }
 #rv-control-panel .rv-theme-btn[data-theme="dark"] { background: #1d1d1f; }
 #rv-control-panel .rv-theme-btn[data-theme="sepia"] { background: #f5e6d0; }
+#rv-control-panel .rv-theme-btn[data-theme="system"] { background: linear-gradient(135deg, #ffffff 50%, #1d1d1f 50%); }
 
 #rv-control-panel .rv-size-options {
   display: flex;
