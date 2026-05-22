@@ -9,13 +9,15 @@ if (!ControlPanel) {
       fontSize: 18,
       maxWidth: 720,
       lineHeight: 1.8,
-      fontFamily: 'serif'
+      fontFamily: 'serif',
+      panelPosition: 'right'
     },
 
     async init() {
       const saved = await chrome.storage.sync.get(Object.keys(this.settings));
       Object.assign(this.settings, saved);
 
+      this.applyPanelPosition(this.settings.panelPosition);
       this.createToggleButton();
       this.createPanel();
     },
@@ -72,6 +74,16 @@ if (!ControlPanel) {
             <option value="sans" ${this.settings.fontFamily === 'sans' ? 'selected' : ''}>无衬线字体 (苹方)</option>
           </select>
         </div>
+
+        <div class="rv-control-group">
+          <span class="rv-control-label">面板位置</span>
+          <div class="rv-position-options" data-setting="panelPosition">
+            <button class="rv-pos-btn" data-value="top">上</button>
+            <button class="rv-pos-btn" data-value="bottom">下</button>
+            <button class="rv-pos-btn" data-value="left">左</button>
+            <button class="rv-pos-btn" data-value="right">右</button>
+          </div>
+        </div>
       `;
 
       this.panelEl.querySelector('.rv-panel-close').addEventListener('click', () => this.toggle());
@@ -113,6 +125,16 @@ if (!ControlPanel) {
         return;
       }
 
+      if (target.classList.contains('rv-pos-btn')) {
+        const value = target.dataset.value;
+        this.settings.panelPosition = value;
+        target.parentElement.querySelectorAll('.rv-pos-btn').forEach(b => b.classList.remove('rv-active'));
+        target.classList.add('rv-active');
+        chrome.storage.sync.set({ panelPosition: value });
+        this.applyPanelPosition(value);
+        return;
+      }
+
       const container = target.closest('[data-setting]') || target;
       const key = container.dataset.setting;
       if (!key) return;
@@ -150,6 +172,17 @@ if (!ControlPanel) {
 
       const lineHeightSlider = this.panelEl.querySelector('[data-setting="lineHeight"]');
       if (lineHeightSlider) lineHeightSlider.value = this.settings.lineHeight;
+
+      const posGroup = this.panelEl.querySelector('.rv-position-options');
+      if (posGroup) {
+        const activePos = posGroup.querySelector(`[data-value="${this.settings.panelPosition}"]`);
+        if (activePos) activePos.classList.add('rv-active');
+      }
+    },
+
+    applyPanelPosition(position) {
+      const rv = document.getElementById('reader-view');
+      if (rv) rv.dataset.rvPanelPosition = position;
     },
   };
 }
