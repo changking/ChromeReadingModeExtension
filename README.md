@@ -24,6 +24,29 @@
 3. 开启右上角的 **开发者模式**
 4. 点击 **加载已解压的扩展**，选择本项目目录
 
+## 打包
+
+### 上传 Chrome 网上应用店
+
+```bash
+zip -r ../reading-mode-extension.zip . \
+  -x '*.git*' 'node_modules/*' 'docs/*' 'AGENTS.md' '*.md' '!/LICENSE'
+```
+
+打包产物 `reading-mode-extension.zip` 可直接上传至 [Chrome 开发者仪表盘](https://chrome.google.com/webstore/devconsole)。
+
+**关键说明：**
+- `.git/`、`node_modules/`、`docs/` 等开发文件应排除
+- 清单文件 `manifest.json` + `background.js` + `content/` + `styles/` + `icons/` 为运行时必备
+- `LICENSE` 保留包含（应用店要求）
+
+### 开发者自用（.crx）
+
+1. 打开 `chrome://extensions`，开启开发者模式
+2. 点击 **打包扩展**（Pack extension）
+3. 选择本项目目录作为**扩展根目录**
+4. 如需固定 App ID，可指定私钥文件（首次打包会生成 `.pem`）
+
 ## 使用
 
 | 操作 | 方式 |
