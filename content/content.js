@@ -1,7 +1,11 @@
 (function() {
   let isReaderMode = false;
 
-  chrome.runtime.onMessage.addListener((msg) => {
+  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.action === 'ping') {
+      sendResponse({});
+      return;
+    }
     if (msg.action === 'enter-reader-mode') {
       if (isReaderMode) return;
       enterReaderMode();

@@ -1,7 +1,9 @@
-const ReaderView = {
-  savedHTML: null,
-  savedScrollY: 0,
-  readerEl: null,
+var ReaderView;
+if (!ReaderView) {
+  ReaderView = {
+    savedHTML: null,
+    savedScrollY: 0,
+    readerEl: null,
 
   enter(doc, article) {
     this.savedHTML = doc.documentElement.outerHTML;
@@ -85,3 +87,4 @@ const ReaderView = {
     return div.innerHTML;
   }
 };
+}

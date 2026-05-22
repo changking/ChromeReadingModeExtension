@@ -1,8 +1,16 @@
 const tabStates = new Map();
-const scriptsInjected = new Set();
+
+async function areContentScriptsPresent(tabId) {
+  try {
+    await chrome.tabs.sendMessage(tabId, { action: 'ping' });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 async function injectContentScripts(tabId) {
-  if (scriptsInjected.has(tabId)) return;
+  if (await areContentScriptsPresent(tabId)) return;
   await chrome.scripting.executeScript({
     target: { tabId },
     files: [
@@ -12,7 +20,6 @@ async function injectContentScripts(tabId) {
       'content/content.js'
     ]
   });
-  scriptsInjected.add(tabId);
 }
 
 async function toggleReaderMode(tab) {
@@ -73,5 +80,4 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
 
 chrome.tabs.onRemoved.addListener((tabId) => {
   tabStates.delete(tabId);
-  scriptsInjected.delete(tabId);
 });

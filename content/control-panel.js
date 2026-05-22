@@ -1,7 +1,9 @@
-const ControlPanel = {
-  panelEl: null,
-  toggleBtn: null,
-  isOpen: false,
+var ControlPanel;
+if (!ControlPanel) {
+  ControlPanel = {
+    panelEl: null,
+    toggleBtn: null,
+    isOpen: false,
   settings: {
     theme: 'light',
     fontSize: 18,
@@ -128,26 +130,6 @@ const ControlPanel = {
 
     chrome.storage.sync.set({ [key]: value });
     ReaderView.applySettings(this.settings);
-  },
-
-  updateActiveStates() {
-    const themeGroup = this.panelEl.querySelector('.rv-theme-options');
-    if (themeGroup) {
-      const activeTheme = themeGroup.querySelector(`[data-theme="${this.settings.theme}"]`);
-      if (activeTheme) activeTheme.classList.add('rv-active');
-    }
-
-    const sizeGroup = this.panelEl.querySelector('[data-setting="maxWidth"]');
-    if (sizeGroup) {
-      const activeSize = sizeGroup.querySelector(`[data-value="${this.settings.maxWidth}"]`);
-      if (activeSize) activeSize.classList.add('rv-active');
-    }
-
-    const fontSizeSlider = this.panelEl.querySelector('[data-setting="fontSize"]');
-    if (fontSizeSlider) fontSizeSlider.value = this.settings.fontSize;
-
-    const lineHeightSlider = this.panelEl.querySelector('[data-setting="lineHeight"]');
-    if (lineHeightSlider) lineHeightSlider.value = this.settings.lineHeight;
-  },
-
+  }
 };
+}
