@@ -30,16 +30,23 @@ if (!ControlPanel) {
       this.createPanel();
     },
 
-    applyTheme(theme) {
-      const resolved = theme === 'system'
+    resolveTheme() {
+      return this.settings.theme === 'system'
         ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-        : theme;
-      ReaderView.applySettings({ ...this.settings, theme: resolved });
+        : this.settings.theme;
+    },
+
+    applySettings() {
+      ReaderView.applySettings({ ...this.settings, theme: this.resolveTheme() });
+    },
+
+    applyTheme(theme) {
+      this.settings.theme = theme;
+      this.applySettings();
     },
 
     applySystemTheme() {
-      const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      ReaderView.applySettings({ ...this.settings, theme });
+      this.applySettings();
     },
 
     createToggleButton() {
@@ -132,7 +139,7 @@ if (!ControlPanel) {
         target.parentElement.querySelectorAll('.rv-theme-btn').forEach(b => b.classList.remove('rv-active'));
         target.classList.add('rv-active');
         chrome.storage.sync.set({ theme: value });
-        this.applyTheme(value);
+        this.applySettings();
         return;
       }
 
@@ -142,7 +149,7 @@ if (!ControlPanel) {
         target.parentElement.querySelectorAll('.rv-size-btn').forEach(b => b.classList.remove('rv-active'));
         target.classList.add('rv-active');
         chrome.storage.sync.set({ maxWidth: value });
-        ReaderView.applySettings(this.settings);
+        this.applySettings();
         return;
       }
 
@@ -172,7 +179,7 @@ if (!ControlPanel) {
       }
 
       chrome.storage.sync.set({ [key]: value });
-      ReaderView.applySettings(this.settings);
+      this.applySettings();
     },
 
     updateActiveStates() {
