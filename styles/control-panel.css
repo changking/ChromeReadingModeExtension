@@ -42,14 +42,14 @@
 
 #reader-view[data-rv-panel-position="right"] #rv-control-panel {
   top: 50%;
-  right: -280px;
-  transform: translateY(-50%);
+  right: 0;
+  transform: translateY(-50%) translateX(100%);
   border-radius: 12px 0 0 12px;
   box-shadow: -4px 0 20px rgba(0,0,0,0.1);
 }
 
 #reader-view[data-rv-panel-position="right"] #rv-control-panel.rv-open {
-  right: 0;
+  transform: translateY(-50%);
 }
 
 /* ===== LEFT ===== */
@@ -62,14 +62,14 @@
 
 #reader-view[data-rv-panel-position="left"] #rv-control-panel {
   top: 50%;
-  left: -280px;
-  transform: translateY(-50%);
+  left: 0;
+  transform: translateY(-50%) translateX(-100%);
   border-radius: 0 12px 12px 0;
   box-shadow: 4px 0 20px rgba(0,0,0,0.1);
 }
 
 #reader-view[data-rv-panel-position="left"] #rv-control-panel.rv-open {
-  left: 0;
+  transform: translateY(-50%);
 }
 
 /* ===== TOP ===== */
