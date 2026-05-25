@@ -69,6 +69,8 @@
 #reader-view .rv-content svg {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin: 1em auto;
 }
 
 #reader-view .rv-content img {
@@ -179,5 +181,10 @@
 
   #reader-view .rv-content a {
     color: black !important;
+  }
+
+  #reader-view .rv-content svg {
+    overflow: visible !important;
+    page-break-inside: avoid;
   }
 }
