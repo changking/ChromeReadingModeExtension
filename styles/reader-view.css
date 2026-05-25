@@ -129,3 +129,50 @@
 #reader-view .rv-close-btn:hover {
   background: rgba(128,128,128,0.15);
 }
+
+#reader-view .rv-pdf-btn {
+  position: fixed;
+  top: 16px;
+  right: 60px;
+  z-index: 2147483647;
+  background: transparent;
+  border: 1px solid rgba(128,128,128,0.3);
+  color: var(--rv-meta);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0.3px;
+}
+
+#reader-view .rv-pdf-btn:hover {
+  background: rgba(128,128,128,0.12);
+  border-color: rgba(128,128,128,0.5);
+}
+
+@media print {
+  #reader-view .rv-close-btn,
+  #reader-view .rv-pdf-btn,
+  #rv-panel-toggle,
+  #rv-control-panel {
+    display: none !important;
+  }
+
+  #reader-view {
+    position: static;
+    overflow: visible;
+    background: white !important;
+    color: black !important;
+  }
+
+  #reader-view .rv-container {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  #reader-view .rv-content a {
+    color: black !important;
+  }
+}

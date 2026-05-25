@@ -28,6 +28,7 @@ if (!ReaderView) {
             <div class="rv-content">${article.content}</div>
           </div>
           <button class="rv-close-btn" id="rv-close-btn" title="退出阅读模式">✕</button>
+          <button class="rv-pdf-btn" id="rv-pdf-btn" title="保存为 PDF">PDF</button>
         </div>
       `;
 
@@ -44,6 +45,9 @@ if (!ReaderView) {
       this.readerEl = document.getElementById('reader-view');
       document.getElementById('rv-close-btn').addEventListener('click', () => {
         ReaderView.exitReaderMode();
+      });
+      document.getElementById('rv-pdf-btn').addEventListener('click', () => {
+        window.print();
       });
 
       this.applySettings();
