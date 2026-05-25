@@ -34,6 +34,7 @@ if (!ReaderView) {
 
       document.open();
       document.write('<!DOCTYPE html><html><head>');
+      document.write(`<title>${this.escapeHTML(article.title)}</title>`);
       stylesheets.forEach(href => {
         document.write(`<link rel="stylesheet" href="${href}">`);
       });
