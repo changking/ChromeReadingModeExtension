@@ -842,6 +842,7 @@ Readability.prototype = {
           "embed",
           "object",
           "iframe",
+          "svg",
         ]).length;
         return (
           contentElementCount === 0 && !this._getInnerText(paragraph, false)
@@ -2006,7 +2007,8 @@ Readability.prototype = {
       (!node.children.length ||
         node.children.length ==
           node.getElementsByTagName("br").length +
-            node.getElementsByTagName("hr").length)
+            node.getElementsByTagName("hr").length +
+            node.getElementsByTagNameNS("http://www.w3.org/2000/svg", "svg").length)
     );
   },
 
@@ -2496,6 +2498,7 @@ Readability.prototype = {
         // ominous signs, remove the element.
         var p = node.getElementsByTagName("p").length;
         var img = node.getElementsByTagName("img").length;
+        var svg = node.getElementsByTagNameNS("http://www.w3.org/2000/svg", "svg").length;
         var li = node.getElementsByTagName("li").length - 100;
         var input = node.getElementsByTagName("input").length;
         var headingDensity = this._getTextDensity(node, [
@@ -2594,9 +2597,9 @@ Readability.prototype = {
               `Suspicious embed. (embedCount=${embedCount}, contentLength=${contentLength})`
             );
           }
-          if (img === 0 && textDensity === 0) {
+          if (img === 0 && svg === 0 && textDensity === 0) {
             errs.push(
-              `No useful content. (img=${img}, textDensity=${textDensity})`
+              `No useful content. (img=${img}, svg=${svg}, textDensity=${textDensity})`
             );
           }
 
