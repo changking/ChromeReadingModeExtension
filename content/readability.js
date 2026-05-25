@@ -2557,6 +2557,14 @@ Readability.prototype = {
         // apply shadiness checks, then check for exceptions
         const shouldRemoveNode = () => {
           const errs = [];
+
+          // Don't remove elements containing SVGs with meaningful text content
+          // (e.g. Mermaid flowcharts, technical diagrams with text labels).
+          // Icon-only SVGs (no text) in low-quality containers will still be removed.
+          if (svg > 0 && contentLength > 0) {
+            return false;
+          }
+
           if (!isFigureChild && img > 1 && p / img < 0.5) {
             errs.push(`Bad p to img ratio (img=${img}, p=${p})`);
           }
