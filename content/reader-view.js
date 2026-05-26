@@ -38,7 +38,7 @@ if (!ReaderView) {
       stylesheets.forEach(href => {
         document.write(`<link rel="stylesheet" href="${href}">`);
       });
-      document.write('<style>#reader-view .rv-content svg{max-width:100%!important;height:auto!important}</style>');
+      document.write('<style>#reader-view .rv-content img[data-rm-svg-id]{width:100%!important;height:auto!important}</style>');
       document.write('</head><body>');
       document.write(articleHTML);
       document.write('</body></html>');

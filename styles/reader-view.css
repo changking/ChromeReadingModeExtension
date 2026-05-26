@@ -66,8 +66,8 @@
   margin-bottom: 1.5em;
 }
 
-#reader-view .rv-content svg {
-  max-width: 100%;
+#reader-view .rv-content img[data-rm-svg-id] {
+  width: 100%;
   height: auto;
   display: block;
   margin: 1em auto;
@@ -183,8 +183,7 @@
     color: black !important;
   }
 
-  #reader-view .rv-content svg {
-    overflow: visible !important;
+  #reader-view .rv-content img[data-rm-svg-id] {
     page-break-inside: avoid;
   }
 }
