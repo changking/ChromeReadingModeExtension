@@ -1,50 +1,49 @@
 var ReaderView;
 if (!ReaderView) {
   ReaderView = {
-    savedHTML: null,
-    savedScrollY: 0,
     readerEl: null,
+    styleEls: null,
 
     enter(doc, article) {
-      this.savedHTML = doc.documentElement.outerHTML;
-      this.savedScrollY = window.scrollY;
+      this.exit();
 
-      const stylesheets = [
-        chrome.runtime.getURL('styles/reader-view.css'),
-        chrome.runtime.getURL('styles/control-panel.css'),
-      ];
-
-      const articleHTML = `
-        <div id="reader-view" data-rv-theme="light" data-rv-panel-position="right">
-          <div class="rv-container">
-            <div class="rv-header">
-              <h1 class="rv-title">${this.escapeHTML(article.title)}</h1>
-              <div class="rv-meta">
-                ${article.byline ? `<span>${article.byline}</span>` : ''}
-                ${article.byline && article.publishedTime ? ' · ' : ''}
-                ${article.publishedTime ? `<span>${new Date(article.publishedTime).toLocaleDateString('zh-CN')}</span>` : ''}
-              </div>
-            </div>
-            <div class="rv-content">${article.content}</div>
-          </div>
-          <button class="rv-close-btn" id="rv-close-btn" title="退出阅读模式">✕</button>
-          <button class="rv-pdf-btn" id="rv-pdf-btn" title="保存为 PDF">PDF</button>
-        </div>
-      `;
-
-      document.open();
-      document.write('<!DOCTYPE html><html><head>');
-      document.write(`<title>${this.escapeHTML(article.title)}</title>`);
-      stylesheets.forEach(href => {
-        document.write(`<link rel="stylesheet" href="${href}">`);
+      this.styleEls = [];
+      ['styles/reader-view.css', 'styles/control-panel.css'].forEach(path => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = chrome.runtime.getURL(path);
+        document.head.appendChild(link);
+        this.styleEls.push(link);
       });
-      document.write('<style>#reader-view .rv-content img[data-rm-svg-id]{width:100%!important;height:auto!important}</style>');
-      document.write('</head><body>');
-      document.write(articleHTML);
-      document.write('</body></html>');
-      document.close();
+      const svgStyle = document.createElement('style');
+      svgStyle.textContent = '#reader-view .rv-content img[data-rm-svg-id]{width:100%!important;height:auto!important}';
+      document.head.appendChild(svgStyle);
+      this.styleEls.push(svgStyle);
 
-      this.readerEl = document.getElementById('reader-view');
+      const el = document.createElement('div');
+      el.id = 'reader-view';
+      el.setAttribute('data-rv-theme', 'light');
+      el.setAttribute('data-rv-panel-position', 'right');
+      el.innerHTML = `
+        <div class="rv-container">
+          <div class="rv-header">
+            <h1 class="rv-title">${this.escapeHTML(article.title)}</h1>
+            <div class="rv-meta">
+              ${article.byline ? `<span>${article.byline}</span>` : ''}
+              ${article.byline && article.publishedTime ? ' · ' : ''}
+              ${article.publishedTime ? `<span>${new Date(article.publishedTime).toLocaleDateString('zh-CN')}</span>` : ''}
+            </div>
+          </div>
+          <div class="rv-content">${article.content}</div>
+        </div>
+        <button class="rv-close-btn" id="rv-close-btn" title="退出阅读模式">✕</button>
+        <button class="rv-pdf-btn" id="rv-pdf-btn" title="保存为 PDF">PDF</button>
+      `;
+      document.documentElement.appendChild(el);
+      this.readerEl = el;
+
+      document.documentElement.style.overflow = 'hidden';
+
       document.getElementById('rv-close-btn').addEventListener('click', () => {
         ReaderView.exitReaderMode();
       });
@@ -56,20 +55,21 @@ if (!ReaderView) {
     },
 
     exit() {
-      if (this.savedHTML) {
-        document.open();
-        document.write(this.savedHTML);
-        document.close();
-        window.scrollTo(0, this.savedScrollY);
+      if (this.readerEl) {
+        this.readerEl.remove();
+        this.readerEl = null;
       }
-      this.savedHTML = null;
-      this.readerEl = null;
+      if (this.styleEls) {
+        this.styleEls.forEach(el => el.remove());
+        this.styleEls = null;
+      }
+      document.documentElement.style.overflow = '';
     },
 
     exitReaderMode() {
+      chrome.runtime.sendMessage({ action: 'reader-mode-exited' }).catch(() => {});
       this.exit();
       window.dispatchEvent(new Event('reader-exit'));
-      chrome.runtime.sendMessage({ action: 'reader-mode-exited' }).catch(() => {});
     },
 
     applySettings(settings) {

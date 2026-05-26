@@ -159,6 +159,8 @@
 }
 
 @media print {
+  body { display: none !important; }
+
   #reader-view .rv-close-btn,
   #reader-view .rv-pdf-btn,
   #rv-panel-toggle,
