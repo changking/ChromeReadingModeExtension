@@ -17,6 +17,24 @@
   });
 
   function enterReaderMode() {
+    // Step 1: Mark all position:fixed/sticky subtrees in the original
+    // document. These are floating UI elements (toolbars, modals, sidebars,
+    // follow/like/comment buttons) that must never reach Readability.
+    function markFixed(container) {
+      for (const child of container.children) {
+        if (child.tagName === 'SVG') continue;
+        try {
+          if (window.getComputedStyle(child).position === 'fixed' ||
+              window.getComputedStyle(child).position === 'sticky') {
+            child.dataset.rmFixed = '1';
+            continue;
+          }
+        } catch (e) {}
+        markFixed(child);
+      }
+    }
+    markFixed(document.documentElement);
+
     // Collect metadata from original (rendered) SVGs before cloning.
     // getBBox() returns the true bounding box of all graphical elements,
     // which may differ from viewBox. Using it ensures the img element
@@ -48,20 +66,7 @@
           isInline = true;
         }
 
-        // Check if SVG sits inside a floating UI element (position:fixed/sticky).
-        // These are never article content and should be stripped from the clone.
-        let isFloating = false;
-        let cur = parent;
-        while (cur && cur !== document.body && cur !== document.documentElement) {
-          if (window.getComputedStyle(cur).position === 'fixed' ||
-              window.getComputedStyle(cur).position === 'sticky') {
-            isFloating = true;
-            break;
-          }
-          cur = cur.parentElement;
-        }
-
-        svgMeta.push({ bounds, isInline, isFloating });
+        svgMeta.push({ bounds, isInline });
       } catch (e) {
         svgMeta.push(null);
       }
@@ -69,15 +74,18 @@
 
     const documentClone = document.cloneNode(true);
 
+    // Remove all marked floating subtrees from the clone so they never
+    // reach Readability.
+    documentClone.querySelectorAll('[data-rm-fixed]').forEach(el => el.remove());
+    // Clean up temporary markers from the original document.
+    document.querySelectorAll('[data-rm-fixed]').forEach(el => el.removeAttribute('data-rm-fixed'));
+
     documentClone.querySelectorAll('svg').forEach((svg, i) => {
       const meta = svgMeta[i];
 
-      // Skip SVGs that belong to floating UI elements (toolbars, buttons, etc.)
-      // — they are never part of the article content.
-      if (meta && meta.isFloating) {
-        svg.remove();
-        return;
-      }
+      // SVGs inside fixed/sticky subtrees are already removed above;
+      // skip if meta is out of range (should not happen).
+      if (!meta) return;
 
       if (!svg.getAttribute('xmlns')) {
         svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
