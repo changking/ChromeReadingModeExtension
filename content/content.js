@@ -48,7 +48,20 @@
           isInline = true;
         }
 
-        svgMeta.push({ bounds, isInline });
+        // Check if SVG sits inside a floating UI element (position:fixed/sticky).
+        // These are never article content and should be stripped from the clone.
+        let isFloating = false;
+        let cur = parent;
+        while (cur && cur !== document.body && cur !== document.documentElement) {
+          if (window.getComputedStyle(cur).position === 'fixed' ||
+              window.getComputedStyle(cur).position === 'sticky') {
+            isFloating = true;
+            break;
+          }
+          cur = cur.parentElement;
+        }
+
+        svgMeta.push({ bounds, isInline, isFloating });
       } catch (e) {
         svgMeta.push(null);
       }
@@ -57,6 +70,15 @@
     const documentClone = document.cloneNode(true);
 
     documentClone.querySelectorAll('svg').forEach((svg, i) => {
+      const meta = svgMeta[i];
+
+      // Skip SVGs that belong to floating UI elements (toolbars, buttons, etc.)
+      // — they are never part of the article content.
+      if (meta && meta.isFloating) {
+        svg.remove();
+        return;
+      }
+
       if (!svg.getAttribute('xmlns')) {
         svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       }
@@ -64,8 +86,6 @@
         svg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
       }
       svg.setAttribute('overflow', 'visible');
-
-      const meta = svgMeta[i];
 
       // Update viewBox to match actual content bounds so the SVG
       // maps correctly into the img's CSS box without clipping.
