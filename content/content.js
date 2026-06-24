@@ -51,6 +51,15 @@
           ? { x: bbox.x, y: bbox.y, w: bbox.width, h: bbox.height }
           : null;
 
+        // getBoundingClientRect() returns the actual CSS-pixel display
+        // size of the SVG element on screen.  Use this for the <img>
+        // dimensions and the inline-vs-content heuristic, NOT the
+        // viewBox-space bounds from getBBox().
+        const rect = svg.getBoundingClientRect();
+        const displaySize = rect && rect.width > 0 && rect.height > 0
+          ? { w: rect.width, h: rect.height }
+          : null;
+
         const parent = svg.parentElement;
         let isInline = true;
         if (parent) {
@@ -62,11 +71,11 @@
 
         // An SVG rendered at 48px or smaller in both dimensions
         // is never meaningful content — always treat as inline.
-        if (bounds && bounds.w <= 48 && bounds.h <= 48) {
+        if (displaySize && displaySize.w <= 48 && displaySize.h <= 48) {
           isInline = true;
         }
 
-        svgMeta.push({ bounds, isInline });
+        svgMeta.push({ bounds, displaySize, isInline });
       } catch (e) {
         svgMeta.push(null);
       }
@@ -106,9 +115,9 @@
       const img = documentClone.createElement('img');
       img.src = 'data:image/svg+xml;base64,' + base64;
       img.setAttribute('data-rm-svg-id', i);
-      if (meta && meta.bounds) {
-        img.setAttribute('width', Math.ceil(meta.bounds.w));
-        img.setAttribute('height', Math.ceil(meta.bounds.h));
+      if (meta && meta.displaySize) {
+        img.setAttribute('width', Math.round(meta.displaySize.w));
+        img.setAttribute('height', Math.round(meta.displaySize.h));
       }
       if (meta && meta.isInline) {
         img.setAttribute('data-rm-svg-inline', '');
