@@ -17,21 +17,34 @@
   });
 
   function enterReaderMode() {
-    // Get actual content bounds from original (rendered) SVGs before cloning.
+    // Collect metadata from original (rendered) SVGs before cloning.
     // getBBox() returns the true bounding box of all graphical elements,
     // which may differ from viewBox. Using it ensures the img element
     // has the correct aspect-ratio and content is not clipped.
-    const svgBounds = [];
+    // Also detects whether each SVG sits in an inline parent context,
+    // so small decorative icons keep their natural size instead of
+    // being forced to width:100%.
+    const inlineParentTags = new Set(['SPAN', 'A', 'EM', 'STRONG', 'B', 'I', 'U', 'SMALL', 'LABEL', 'BUTTON', 'CODE', 'KBD', 'SUB', 'SUP', 'MARK', 'ABBR', 'CITE', 'TIME']);
+    const svgMeta = [];
     document.querySelectorAll('svg').forEach((svg) => {
       try {
         const bbox = svg.getBBox();
-        svgBounds.push(
-          bbox && bbox.width > 0 && bbox.height > 0
-            ? { x: bbox.x, y: bbox.y, w: bbox.width, h: bbox.height }
-            : null
-        );
+        const bounds = bbox && bbox.width > 0 && bbox.height > 0
+          ? { x: bbox.x, y: bbox.y, w: bbox.width, h: bbox.height }
+          : null;
+
+        const parent = svg.parentElement;
+        let isInline = true;
+        if (parent) {
+          const display = window.getComputedStyle(parent).display;
+          isInline = display.startsWith('inline')
+            || parent.tagName === 'P'
+            || inlineParentTags.has(parent.tagName);
+        }
+
+        svgMeta.push({ bounds, isInline });
       } catch (e) {
-        svgBounds.push(null);
+        svgMeta.push(null);
       }
     });
 
@@ -46,11 +59,12 @@
       }
       svg.setAttribute('overflow', 'visible');
 
+      const meta = svgMeta[i];
+
       // Update viewBox to match actual content bounds so the SVG
       // maps correctly into the img's CSS box without clipping.
-      const bounds = svgBounds[i];
-      if (bounds) {
-        svg.setAttribute('viewBox', `${bounds.x} ${bounds.y} ${bounds.w} ${bounds.h}`);
+      if (meta && meta.bounds) {
+        svg.setAttribute('viewBox', `${meta.bounds.x} ${meta.bounds.y} ${meta.bounds.w} ${meta.bounds.h}`);
       }
 
       const svgText = new XMLSerializer().serializeToString(svg);
@@ -58,9 +72,12 @@
       const img = documentClone.createElement('img');
       img.src = 'data:image/svg+xml;base64,' + base64;
       img.setAttribute('data-rm-svg-id', i);
-      if (bounds) {
-        img.setAttribute('width', Math.ceil(bounds.w));
-        img.setAttribute('height', Math.ceil(bounds.h));
+      if (meta && meta.bounds) {
+        img.setAttribute('width', Math.ceil(meta.bounds.w));
+        img.setAttribute('height', Math.ceil(meta.bounds.h));
+      }
+      if (meta && meta.isInline) {
+        img.setAttribute('data-rm-svg-inline', '');
       }
 
       svg.parentNode.replaceChild(img, svg);

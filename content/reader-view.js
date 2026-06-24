@@ -16,7 +16,7 @@ if (!ReaderView) {
         this.styleEls.push(link);
       });
       const svgStyle = document.createElement('style');
-      svgStyle.textContent = '#reader-view .rv-content img[data-rm-svg-id]{width:100%!important;height:auto!important}';
+      svgStyle.textContent = '#reader-view .rv-content img[data-rm-svg-id]:not([data-rm-svg-inline]){width:100%!important;height:auto!important}#reader-view .rv-content img[data-rm-svg-inline]{max-width:100%!important;height:auto!important}';
       document.head.appendChild(svgStyle);
       this.styleEls.push(svgStyle);
 

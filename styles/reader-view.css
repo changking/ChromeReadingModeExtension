@@ -66,11 +66,21 @@
   margin-bottom: 1.5em;
 }
 
-#reader-view .rv-content img[data-rm-svg-id] {
+/* Content SVGs (block-level parents, e.g. charts, diagrams) fill container */
+#reader-view .rv-content img[data-rm-svg-id]:not([data-rm-svg-inline]) {
   width: 100%;
   height: auto;
   display: block;
   margin: 1em auto;
+}
+
+/* Decorative SVGs (inline parents, e.g. small icons) keep natural size */
+#reader-view .rv-content img[data-rm-svg-inline] {
+  max-width: 100%;
+  height: auto;
+  display: inline;
+  margin: 0;
+  border-radius: 0;
 }
 
 #reader-view .rv-content img {
