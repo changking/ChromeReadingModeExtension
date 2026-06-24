@@ -42,6 +42,12 @@
             || inlineParentTags.has(parent.tagName);
         }
 
+        // An SVG rendered at 48px or smaller in both dimensions
+        // is never meaningful content — always treat as inline.
+        if (bounds && bounds.w <= 48 && bounds.h <= 48) {
+          isInline = true;
+        }
+
         svgMeta.push({ bounds, isInline });
       } catch (e) {
         svgMeta.push(null);
