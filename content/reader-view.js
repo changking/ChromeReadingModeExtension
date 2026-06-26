@@ -4,7 +4,7 @@ if (!ReaderView) {
     readerEl: null,
     styleEls: null,
 
-    enter(doc, article) {
+    enter(doc, article, origStylesheets) {
       this.exit();
 
       this.styleEls = [];
@@ -19,6 +19,18 @@ if (!ReaderView) {
       svgStyle.textContent = '#reader-view .rv-content img[data-rm-svg-id]:not([data-rm-svg-inline]){width:100%!important;height:auto!important}#reader-view .rv-content img[data-rm-svg-inline]{max-width:100%!important;height:auto!important}';
       document.head.appendChild(svgStyle);
       this.styleEls.push(svgStyle);
+
+      // Inject original page stylesheets so page-specific styling
+      // (e.g. fonts, colors, decorations) carries into reader mode.
+      if (origStylesheets) {
+        origStylesheets.forEach(ss => {
+          const el = ss.type === 'link'
+            ? (() => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = ss.href; return l; })()
+            : (() => { const s = document.createElement('style'); s.textContent = ss.text; return s; })();
+          document.head.appendChild(el);
+          this.styleEls.push(el);
+        });
+      }
 
       const el = document.createElement('div');
       el.id = 'reader-view';

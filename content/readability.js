@@ -208,7 +208,6 @@ Readability.prototype = {
     "frame",
     "hspace",
     "rules",
-    "style",
     "valign",
     "vspace",
   ],
@@ -658,19 +657,6 @@ Readability.prototype = {
    **/
   _prepDocument() {
     var doc = this._doc;
-
-    // Remove all style tags in head, but not those inside SVG elements
-    // (e.g. Mermaid diagrams rely on internal <style> for class-based rendering)
-    this._removeNodes(this._getAllNodesWithTag(doc, ["style"]), function (style) {
-      var el = style.parentNode;
-      while (el) {
-        if (el.nodeType === 1 && el.tagName && el.tagName.toLowerCase() === 'svg') {
-          return false;
-        }
-        el = el.parentNode;
-      }
-      return true;
-    });
 
     if (doc.body) {
       this._replaceBrs(doc.body);

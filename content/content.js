@@ -101,6 +101,15 @@
 
     const documentClone = document.cloneNode(true);
 
+    // Collect original stylesheets to preserve in reader view.
+    const origStylesheets = [];
+    document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+      if (link.href) origStylesheets.push({ type: 'link', href: link.href });
+    });
+    document.querySelectorAll('style').forEach(style => {
+      origStylesheets.push({ type: 'style', text: style.textContent });
+    });
+
     // Remove all marked floating subtrees from the clone so they never
     // reach Readability.
     documentClone.querySelectorAll('[data-rm-fixed]').forEach(el => el.remove());
@@ -182,14 +191,14 @@
     // clone before Readability parses it.
     normalizeLazyAttributes(documentClone);
 
-    const article = new Readability(documentClone).parse();
+    const article = new Readability(documentClone, { keepClasses: true }).parse();
 
     if (!article) {
       showError('无法识别当前页面的文章内容。');
       return;
     }
 
-    ReaderView.enter(document, article);
+    ReaderView.enter(document, article, origStylesheets);
     ControlPanel.init();
     isReaderMode = true;
   }
